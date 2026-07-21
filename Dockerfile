@@ -1,14 +1,11 @@
-FROM rocker/r-ver:4.3.2
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libssl-dev \
-    libcurl4-openssl-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN R -e "install.packages('shiny', repos='https://cloud.r-project.org')"
+FROM rocker/shiny:4.3.2
 
 WORKDIR /app
 COPY . /app
+
+# rocker/shiny ships shiny-server, but we run the app directly with runApp
+# so we control the port Render assigns via $PORT.
+RUN R -e "if (!requireNamespace('shiny', quietly = TRUE)) stop('shiny package missing from base image')"
 
 EXPOSE 3838
 
